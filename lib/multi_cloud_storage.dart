@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
-import 'package:multi_cloud_storage/cloud_storage_provider.dart';
-import 'package:multi_cloud_storage/google_drive_provider.dart';
+import  'package:multi_cloud_storage/cloud_storage_provider.dart';
+import  'package:multi_cloud_storage/google_drive_provider.dart';
+import  'package:multi_cloud_storage/google_drive_provider_desktop.dart';
 import 'package:multi_cloud_storage/icloud_provider.dart';
 import 'package:multi_cloud_storage/onedrive_provider.dart';
 
 import 'dropbox_provider.dart';
+import 'google_drive_provider.dart';
 
 class MultiCloudStorage {
   static CloudAccessType cloudAccess = CloudAccessType.appStorage;
@@ -23,11 +27,25 @@ class MultiCloudStorage {
   static Future<CloudStorageProvider?> connectToGoogleDrive(
           {bool forceInteractive = false,
           List<String>? scopes,
-          String? serverClientId}) =>
-      GoogleDriveProvider.connect(
-          forceInteractive: forceInteractive,
-          scopes: scopes,
-          serverClientId: serverClientId);
+          String? serverClientId,
+            String? clientSecret,
+            int redirectPort = 8000}) {
+      if (Platform.isWindows || Platform.isLinux) {
+        return GoogleDriveProviderDesktop.connect(
+              forceInteractive: forceInteractive,
+              scopes: scopes,
+              serverClientId: serverClientId,
+              clientSecret: clientSecret,
+              redirectPort: redirectPort);
+      } else {
+        return GoogleDriveProvider.connect(
+            forceInteractive: forceInteractive,
+            scopes: scopes,
+            serverClientId: serverClientId,
+            clientSecret: clientSecret,
+            redirectPort: redirectPort);
+      }
+  }
 
   static Future<CloudStorageProvider?> connectToIcloud(
           {required String containerId}) =>
