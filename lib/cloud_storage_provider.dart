@@ -30,6 +30,10 @@ abstract class CloudStorageProvider {
   /// Retrieves the display name of the currently logged-in user.
   Future<String?> loggedInUserDisplayName();
 
+  Future<String?> loggedInUserProfile();
+
+  Future<String?> loggedInUserID();
+
   /// Checks if the current user's authentication token is expired.
   Future<bool> tokenExpired();
 
@@ -43,8 +47,7 @@ abstract class CloudStorageProvider {
   Future<String?> getShareTokenFromShareLink(Uri shareLink);
 
   /// Downloads a file to [localPath] using a [shareToken].
-  Future<String> downloadFileByShareToken(
-      {required String shareToken, required String localPath});
+  Future<String> downloadFileByShareToken({required String shareToken, required String localPath});
 
   /// Uploads a file from [localPath] using a [shareToken].
   Future<String> uploadFileByShareToken({

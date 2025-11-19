@@ -30,8 +30,7 @@ class ICloudProvider extends CloudStorageProvider {
     // iCloud is only available on iOS.
     if (Platform.isIOS == false && Platform.isMacOS == false) {
       debugPrint('iCloud Storage is only available on iOS and.');
-      throw UnsupportedError(
-          'iCloud Storage is only available on iOS and MacOs.');
+      throw UnsupportedError('iCloud Storage is only available on iOS and MacOs.');
     }
     _instance ??= ICloudProvider._create(containerId);
     return _instance;
@@ -47,8 +46,7 @@ class ICloudProvider extends CloudStorageProvider {
     final allFiles = await _icloudSync.gather(containerId: _containerId);
     final List<CloudFile> results = [];
     // Normalize the directory path for consistent comparison.
-    final normalizedPath =
-        path == '/' ? '' : path.replaceAll(RegExp(r'/$'), '');
+    final normalizedPath = path == '/' ? '' : path.replaceAll(RegExp(r'/$'), '');
     for (final icloudFile in allFiles) {
       final itemPath = icloudFile.relativePath;
       if (recursive) {
@@ -60,8 +58,7 @@ class ICloudProvider extends CloudStorageProvider {
         // For non-recursive, check if the item is a direct child.
         // The parent directory of the item should be the same as the target path.
         final parentDir = p.dirname(itemPath);
-        final rootEquivalent = parentDir == '.' &&
-            (normalizedPath.isEmpty || normalizedPath == '/');
+        final rootEquivalent = parentDir == '.' && (normalizedPath.isEmpty || normalizedPath == '/');
         if (parentDir == normalizedPath || rootEquivalent) {
           results.add(_mapToCloudFile(icloudFile));
         }
@@ -94,17 +91,12 @@ class ICloudProvider extends CloudStorageProvider {
               // This handles errors that might occur *during* the download stream.
               if (!completer.isCompleted) {
                 // You can still keep your original checks here as a fallback.
-                if (error is PlatformException &&
-                    error.toString().contains('NSURLErrorDomain Code=-1009')) {
-                  completer
-                      .completeError(NoConnectionException(error.toString()));
-                } else if (error
-                    .toString()
-                    .contains('NSCocoaErrorDomain Code=4')) {
+                if (error is PlatformException && error.toString().contains('NSURLErrorDomain Code=-1009')) {
+                  completer.completeError(NoConnectionException(error.toString()));
+                } else if (error.toString().contains('NSCocoaErrorDomain Code=4')) {
                   completer.completeError(NotFoundException(error.toString()));
                 } else {
-                  completer.completeError(Exception(
-                      'iCloud download failed during stream: $error'));
+                  completer.completeError(Exception('iCloud download failed during stream: $error'));
                 }
               }
             },
@@ -123,11 +115,9 @@ class ICloudProvider extends CloudStorageProvider {
       // **FIX:** Handle initial errors, like "file not found", here.
       if (!completer.isCompleted) {
         if (e.toString().contains('NSCocoaErrorDomain Code=4')) {
-          completer.completeError(
-              NotFoundException('File not found at path: $remotePath'));
+          completer.completeError(NotFoundException('File not found at path: $remotePath'));
         } else if (e.toString().contains('NSURLErrorDomain Code=-1009')) {
-          completer.completeError(NoConnectionException(
-              'Failed to download from iCloud. Check your internet connection.'));
+          completer.completeError(NoConnectionException('Failed to download from iCloud. Check your internet connection.'));
         } else {
           completer.completeError(e); // Rethrow other platform exceptions.
         }
@@ -163,10 +153,8 @@ class ICloudProvider extends CloudStorageProvider {
       return remotePath;
     } on PlatformException catch (e) {
       // ADD THIS CHECK: for "No Connection" (NSURLErrorDomain Code -1009)
-      if (e.code == '-1009' ||
-          e.toString().contains('NSURLErrorDomain Code=-1009')) {
-        throw NoConnectionException(
-            'Failed to upload to iCloud. Please check your internet connection.');
+      if (e.code == '-1009' || e.toString().contains('NSURLErrorDomain Code=-1009')) {
+        throw NoConnectionException('Failed to upload to iCloud. Please check your internet connection.');
       }
       rethrow;
     }
@@ -186,8 +174,7 @@ class ICloudProvider extends CloudStorageProvider {
     // The `iCloud_Storage_Sync` package does not provide a method to explicitly
     // create an empty directory. Directories are created implicitly when a file
     // is uploaded into a non-existent path.
-    throw UnimplementedError(
-        'iCloudProvider: createDirectory is not supported. Directories are created automatically upon file upload.');
+    throw UnimplementedError('iCloudProvider: createDirectory is not supported. Directories are created automatically upon file upload.');
   }
 
   /// Retrieves metadata for the file or directory at the specified [path].
@@ -196,8 +183,7 @@ class ICloudProvider extends CloudStorageProvider {
     final allFiles = await _icloudSync.gather(containerId: _containerId);
     final foundFile = allFiles.firstWhere(
       (f) => f.relativePath == path,
-      orElse: () =>
-          throw Exception('iCloudProvider: File not found at path: $path'),
+      orElse: () => throw Exception('iCloudProvider: File not found at path: $path'),
     );
     return _mapToCloudFile(foundFile);
   }
@@ -205,9 +191,14 @@ class ICloudProvider extends CloudStorageProvider {
   @override
   Future<String?> loggedInUserDisplayName() {
     // The package does not provide access to user information like display name.
-    throw UnimplementedError(
-        'iCloudProvider: Cannot retrieve user display name.');
+    throw UnimplementedError('iCloudProvider: Cannot retrieve user display name.');
   }
+
+  @override
+  Future<String?> loggedInUserProfile() async => null;
+
+  @override
+  Future<String?> loggedInUserID() async => null;
 
   @override
   Future<bool> tokenExpired() async {
@@ -226,8 +217,7 @@ class ICloudProvider extends CloudStorageProvider {
   /// iCloud access is limited to the container and can't share files directly.
   @override
   Future<Uri?> generateShareLink(String path) {
-    throw UnsupportedError(
-        'iCloudProvider: Generating sharable links is not supported.');
+    throw UnsupportedError('iCloudProvider: Generating sharable links is not supported.');
   }
 
   /// iCloud access is limited to the container and can't share files directly.
@@ -238,11 +228,9 @@ class ICloudProvider extends CloudStorageProvider {
 
   /// iCloud access is limited to the container and can't share files directly.
   @override
-  Future<String> downloadFileByShareToken(
-      {required String shareToken, required String localPath}) {
+  Future<String> downloadFileByShareToken({required String shareToken, required String localPath}) {
     // The package does not support sharing.
-    throw UnsupportedError(
-        'iCloudProvider: Sharing functionality is not supported.');
+    throw UnsupportedError('iCloudProvider: Sharing functionality is not supported.');
   }
 
   /// iCloud access is limited to the container and can't share files directly.
@@ -252,8 +240,7 @@ class ICloudProvider extends CloudStorageProvider {
     required String shareToken,
     Map<String, dynamic>? metadata,
   }) async {
-    throw UnsupportedError(
-        'iCloud doesn\'t allow sharing of files since each app has its own container');
+    throw UnsupportedError('iCloud doesn\'t allow sharing of files since each app has its own container');
   }
 
   /// Helper to convert from the package's model to the abstract model.
